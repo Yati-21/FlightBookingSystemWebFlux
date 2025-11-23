@@ -2,6 +2,7 @@ package com.flight.request;
 
 import java.util.List;
 
+import com.flight.entity.FlightType;
 import com.flight.entity.MealType;
 
 import jakarta.validation.constraints.Min;
@@ -27,6 +28,9 @@ public class BookingRequest
     @NotNull(message="mealType is required")
     private MealType mealType;
 
+    @NotNull(message = "flightType is required")
+    private FlightType flightType;
+    
     @NotEmpty(message="passengers cannot be empty")
     private List<PassengerRequest> passengers;
 }

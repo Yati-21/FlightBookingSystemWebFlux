@@ -54,7 +54,7 @@ public class Flight
     private FlightStatus status;
 
     
-    @AssertTrue(message="fromCity and toCity cannot be same")
+    @AssertTrue(message="fromCity and toCity cannot be same or null")
     public boolean isDifferentCities() 
     {
         return fromCity!=null && toCity!=null && !fromCity.equals(toCity);

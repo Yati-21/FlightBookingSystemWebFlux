@@ -21,7 +21,6 @@ public class Booking {
     @Id
     private String id;
 
-    @NotBlank(message="PNR is required")
     private String pnr;
 
     //from user table
@@ -38,5 +37,9 @@ public class Booking {
     @NotNull(message="Meal type is required")
     private MealType mealType;
     
+    @NotNull(message = "flightType is required")
+    private FlightType flightType;
+    
     private List<String> passengerIds;
+        
 }

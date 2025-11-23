@@ -2,6 +2,8 @@ package com.flight.request;
 
 import java.time.LocalDate;
 
+import com.flight.entity.AirportCode;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -12,10 +14,10 @@ import lombok.Setter;
 public class FlightSearchRequest 
 {
     @NotBlank(message="from is required")
-    private String from;
+    private AirportCode  from;
 
     @NotBlank(message="to is required")
-    private String to;
+    private AirportCode to;
 
     @NotNull(message="date is required")
     private LocalDate date;

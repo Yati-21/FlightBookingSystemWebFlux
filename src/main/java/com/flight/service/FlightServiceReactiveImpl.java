@@ -4,11 +4,13 @@ import com.flight.entity.*;
 import com.flight.exception.BusinessException;
 import com.flight.exception.NotFoundException;
 import com.flight.exception.SeatUnavailableException;
+import com.flight.repository.AirlineRepository;
 import com.flight.repository.BookingRepository;
 import com.flight.repository.FlightRepository;
 import com.flight.repository.PassengerRepository;
 import com.flight.repository.UserRepository;
 import com.flight.request.BookingRequest;
+import com.flight.request.FlightCreateRequest;
 import com.flight.request.PassengerRequest;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,7 @@ import java.util.*;
 public class FlightServiceReactiveImpl implements FlightServiceReactive 
 {
 
-    private static final long CANCELLATION_LIMIT_HOURS = 24;
+    private static final int CANCELLATION_LIMIT_HOURS=24;
 
     @Autowired
     private FlightRepository flightRepo;
@@ -40,43 +42,52 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
 
     @Autowired
     private PassengerRepository passengerRepo;
+    
+    @Autowired
+    private AirlineRepository airlineRepo;
 
     @Autowired
     private UserRepository userRepo;
 
-
     @Override
-    public Mono<Flight> addFlight(Flight flight) 
+    public Mono<Flight> addFlight(FlightCreateRequest req) 
     {
-    	
-    	LocalDateTime now = LocalDateTime.now();
+        return airlineRepo.findById(req.getAirlineCode())
+                .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
+                .flatMap(airline-> 
+                {
+                    LocalDateTime now=LocalDateTime.now();
+                    if (req.getDepartureTime().isBefore(now)) 
+                    {
+                        return Mono.error(new BusinessException("Flight departure must be in future"));
+                    }
+                    if (req.getArrivalTime().isBefore(req.getDepartureTime())) 
+                    {
+                        return Mono.error(new BusinessException("Arrival must be after departure"));
+                    }
+                    Flight flight = new Flight();
+                    flight.setAirlineCode(req.getAirlineCode());
+                    flight.setFlightNumber(req.getFlightNumber());
+                    flight.setFromCity(req.getFromCity());
+                    flight.setToCity(req.getToCity());
+                    flight.setDepartureTime(req.getDepartureTime());
+                    flight.setArrivalTime(req.getArrivalTime());
+                    flight.setTotalSeats(req.getTotalSeats());
+                    flight.setAvailableSeats(req.getTotalSeats());
+                    flight.setPrice(req.getPrice());
+                    flight.setStatus(req.getStatus());
 
-        //check flight must have future departure
-        if (flight.getDepartureTime().isBefore(now)) 
-        {
-            return Mono.error(new BusinessException("Flight departure time must be in the future"));
-        }
-
-        //check arrival >departure
-        if (flight.getArrivalTime().isBefore(flight.getDepartureTime())) 
-        {
-            return Mono.error(new BusinessException("Arrival time must be after departure time"));
-        }
-    	
-        //when a flight is created total = available seats
-        flight.setAvailableSeats(flight.getTotalSeats());
-        return flightRepo.save(flight);
+                    return flightRepo.save(flight);
+                });
     }
-
+    
+    
     @Override
-    public Flux<Flight> searchFlights(String from,String to,LocalDate date) 
-    {    
-        AirportCode fromCity=AirportCode.fromString(from);
-        AirportCode toCity=AirportCode.fromString(to);
-
-        //find flights 
-        return flightRepo.findByFromCityAndToCity(fromCity, toCity).filter(f->f.getDepartureTime().toLocalDate().equals(date));
+    public Flux<Flight> searchFlights(AirportCode from,AirportCode to,LocalDate date) {
+        return flightRepo.findByFromCityAndToCity(from,to)
+                .filter(flight->flight.getDepartureTime().toLocalDate().equals(date));
     }
+
 
     @Override
     public Mono<Flight> getFlightById(String flightId) 
@@ -88,12 +99,14 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     @Override
     public Mono<String> bookTicket(String flightId, BookingRequest request) 
     {
-        return flightRepo.findById(flightId)
+    	return userRepo.findById(request.getUserId())
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .then(flightRepo.findById(flightId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Flight not found")))
                 .flatMap(flight->
                 {    
                 	//check if passenger count =seats boooked
-                    if (request.getPassengers().size() != request.getSeatsBooked()) 
+                    if (request.getPassengers().size()!= request.getSeatsBooked()) 
                     {
                         return Mono.error(new BusinessException("Passengers count must be equal to seats booked"));
                     }
@@ -108,52 +121,58 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                     validatePassengerDuplicateRequest(request.getPassengers());
                     
                     //check seat conflicts with existing bookings
-                    return checkSeatConflicts(flightId, request.getPassengers()).then(saveNewBooking(flight, request));
-                });
+                    return checkSeatConflicts(flightId,request.getPassengers()).then(saveNewBooking(flight,request));
+                }));
     }
 
-    private Mono<String> saveNewBooking(Flight flight, BookingRequest req) 
+    private Mono<String> saveNewBooking(Flight flight,BookingRequest req) 
     {
-        String pnr= generateRandomPNR();
-
+        String pnr=generateRandomPNR();
         Booking booking =new Booking();
         booking.setPnr(pnr);
         booking.setFlightId(flight.getId());
         booking.setUserId(req.getUserId());
         booking.setSeatsBooked(req.getSeatsBooked());
         booking.setMealType(req.getMealType());
+        booking.setFlightType(req.getFlightType());
+        booking.setPassengerIds(new ArrayList<>());  //initialize empty list
 
         return bookingRepo.save(booking)
-                .flatMap(savedBooking-> 
-                {
-                    //reduce flight available seats
-                    flight.setAvailableSeats(flight.getAvailableSeats() -req.getSeatsBooked());
+                .flatMap(savedBooking ->
+                    savePassengersAndCollectIds(savedBooking.getId(), req.getPassengers())
+                        .flatMap(passengerIds -> {
 
-                    return flightRepo.save(flight).then(savePassengers(savedBooking.getId(), req.getPassengers())).thenReturn(savedBooking.getPnr());
-                });
+                            savedBooking.setPassengerIds(passengerIds);
+
+                            flight.setAvailableSeats(flight.getAvailableSeats()-req.getSeatsBooked());
+
+                            return bookingRepo.save(savedBooking)
+                                    .then(flightRepo.save(flight))
+                                    .thenReturn(savedBooking.getPnr());
+                        })
+                );
     }
-
-    private Mono<Void> savePassengers(String bookingId, List<PassengerRequest> passengers) {
-        return Flux.fromIterable(passengers)
-                .flatMap(req -> 
+    
+    private Mono<List<String>> savePassengersAndCollectIds(String bookingId, List<PassengerRequest> list) {
+        return Flux.fromIterable(list).flatMap(req -> 
                 {
-                    Passenger passenger=new Passenger();
+                    Passenger passenger = new Passenger();
                     passenger.setName(req.getName());
-                    passenger.setGender(Gender.valueOf(req.getGender()));
+                    passenger.setGender(req.getGender());
                     passenger.setAge(req.getAge());
                     passenger.setSeatNumber(req.getSeatNumber());
                     passenger.setBookingId(bookingId);
                     return passengerRepo.save(passenger);
                 })
-                .then();
+                .map(Passenger::getId)
+                .collectList();
     }
 
 
     @Override
     public Mono<Booking> getTicket(String pnr) 
     {
-        return bookingRepo.findByPnr(pnr)
-                .switchIfEmpty(Mono.error(new NotFoundException("PNR not found")));
+        return bookingRepo.findByPnr(pnr).switchIfEmpty(Mono.error(new NotFoundException("PNR not found")));
     }
 
     @Override
@@ -163,7 +182,7 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     }
 
     @Override
-    public Mono<String> cancelBooking(String pnr) 
+    public Mono<Void> cancelBooking(String pnr) 
     {
         return bookingRepo.findByPnr(pnr)
                 .switchIfEmpty(Mono.error(new NotFoundException("Invalid PNR")))
@@ -176,19 +195,14 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                                 {
                                     return Mono.error(new BusinessException("Cannot cancel within 24 hours of departure"));
                                 }
-                                //restore seats
                                 flight.setAvailableSeats(flight.getAvailableSeats()+booking.getSeatsBooked());
-
                                 return passengerRepo.deleteByBookingId(booking.getId())
                                         .then(bookingRepo.delete(booking))
                                         .then(flightRepo.save(flight))
-                                        .thenReturn("Booking cancelled: "+booking.getPnr());
+                                        .then();
                             });
                 });
     }
-
-
-
 
 
     private Mono<Void> checkSeatConflicts(String flightId, List<PassengerRequest> newPassengers) 
@@ -224,7 +238,7 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     
     private String generateRandomPNR() 
     {
-        return "PNR"+new Random().nextInt(90000);
+        return "PNR"+UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
     
 

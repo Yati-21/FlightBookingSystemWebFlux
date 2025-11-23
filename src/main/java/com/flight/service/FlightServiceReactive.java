@@ -1,8 +1,11 @@
 package com.flight.service;
 
+import com.flight.entity.AirportCode;
 import com.flight.entity.Booking;
 import com.flight.entity.Flight;
 import com.flight.request.BookingRequest;
+import com.flight.request.FlightCreateRequest;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -11,9 +14,9 @@ import java.time.LocalDate;
 public interface FlightServiceReactive 
 {
 
-    Mono<Flight> addFlight(Flight flight);
+    Mono<Flight> addFlight(FlightCreateRequest request);
 
-    Flux<Flight> searchFlights(String from,String to, LocalDate date);
+    Flux<Flight> searchFlights(AirportCode from, AirportCode to, LocalDate date);
 
     Mono<Flight> getFlightById(String flightId);
 
@@ -23,9 +26,7 @@ public interface FlightServiceReactive
 
     Flux<Booking> getBookingHistoryByUserId(String userId);
 
-    Mono<String> cancelBooking(String pnr);
-
-    //Mono<Booking> updateBooking(String pnr, BookingRequest req);
+    Mono<Void> cancelBooking(String pnr);
 
     Flux<Flight> getFlightsByAirline(String airlineCode);
 }
