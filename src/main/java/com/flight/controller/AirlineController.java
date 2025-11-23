@@ -3,6 +3,7 @@ package com.flight.controller;
 import com.flight.entity.Airline;
 import com.flight.exception.NotFoundException;
 import com.flight.repository.AirlineRepository;
+import com.flight.request.AirlineCreateRequest;
 import com.flight.request.AirlineUpdateRequest;
 
 import jakarta.validation.Valid;
@@ -22,15 +23,12 @@ public class AirlineController
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Airline> createAirline(@RequestBody @Valid Airline airline) 
+    public Mono<Airline> createAirline(@RequestBody @Valid AirlineCreateRequest req) 
     {
+        Airline airline=new Airline();
+        airline.setCode(req.getCode());
+        airline.setName(req.getName());
         return airlineRepo.save(airline);
-    }
-
-    @GetMapping("/{code}")
-    public Mono<Airline> getAirline(@PathVariable String code) 
-    {
-        return airlineRepo.findById(code).switchIfEmpty(Mono.error(new NotFoundException("Airline not found")));
     }
 
     @GetMapping

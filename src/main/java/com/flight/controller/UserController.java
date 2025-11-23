@@ -3,6 +3,7 @@ package com.flight.controller;
 import com.flight.entity.User;
 import com.flight.exception.NotFoundException;
 import com.flight.repository.UserRepository;
+import com.flight.request.UserCreateRequest;
 import com.flight.request.UserUpdateRequest;
 
 import jakarta.validation.Valid;
@@ -21,10 +22,14 @@ public class UserController
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<User> createUser(@RequestBody @Valid User user) 
+    public Mono<User> createUser(@RequestBody @Valid UserCreateRequest req) 
     {
+        User user =new User();
+        user.setName(req.getName());
+        user.setEmail(req.getEmail());
         return userRepo.save(user);
     }
+
 
     @GetMapping("/{id}")
     public Mono<User> getUser(@PathVariable String id) 
