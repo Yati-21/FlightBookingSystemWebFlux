@@ -25,7 +25,7 @@ public interface FlightServiceReactive
 
     Mono<String> cancelBooking(String pnr);
 
-    Mono<Booking> updateBooking(String pnr,BookingRequest req);
+    Mono<Booking> updateBooking(String pnr, BookingRequest req);
 
     Flux<Flight> getFlightsByAirline(String airlineCode);
 }

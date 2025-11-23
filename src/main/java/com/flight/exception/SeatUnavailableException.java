@@ -1,5 +1,14 @@
 package com.flight.exception;
 
-public class SeatUnavailableException {
 
+//used if seat already booked
+//or if not enough seat available
+
+public class SeatUnavailableException extends RuntimeException 
+{
+
+    public SeatUnavailableException(String message) 
+    {
+        super(message);
+    }
 }
