@@ -1,7 +1,5 @@
 package com.flight.entity;
 
-import com.flight.exception.BusinessException;
-
 public enum AirportCode 
 {
     DEL,   
@@ -14,16 +12,4 @@ public enum AirportCode
     PNQ,
     AMD,
     COK;
-
-//    public static AirportCode fromString(String code) 
-//    {
-//        try 
-//        {
-//            return AirportCode.valueOf(code.toUpperCase());
-//        } 
-//        catch (IllegalArgumentException ex) 
-//        {
-//            throw new BusinessException("Invalid airport code: "+code);
-//        }
-//    }
 }

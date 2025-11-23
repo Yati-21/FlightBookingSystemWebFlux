@@ -1,6 +1,21 @@
 package com.flight.service;
 
-import com.flight.entity.*;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.flight.entity.AirportCode;
+import com.flight.entity.Booking;
+import com.flight.entity.Flight;
+import com.flight.entity.Passenger;
 import com.flight.exception.BusinessException;
 import com.flight.exception.NotFoundException;
 import com.flight.exception.SeatUnavailableException;
@@ -13,17 +28,8 @@ import com.flight.request.BookingRequest;
 import com.flight.request.PassengerRequest;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
 
 
 @Slf4j
@@ -63,7 +69,6 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                         return Mono.error(new BusinessException("Flight departure time must be in the future"));
                     }
 
-                    flight.setId(null); //client cant override id
                     flight.setAvailableSeats(flight.getTotalSeats());
 
                     return flightRepo.save(flight);
@@ -211,15 +216,17 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     
     private void validatePassengerDuplicateRequest(List<PassengerRequest> passengers) 
     {
-        Set<String> set=new HashSet<>();
-        for (PassengerRequest passengerReq:passengers) {
-            String key=passengerReq.getName()+"-"+passengerReq.getAge() +"-"+passengerReq.getGender();
-            if (!set.add(key)) 
+        Set<String> seats = new HashSet<>();
+        for (PassengerRequest passengerReq:passengers) 
+        {
+            if (!seats.add(passengerReq.getSeatNumber())) 
             {
-                throw new BusinessException("Duplicate passenger: "+passengerReq.getName());
+                throw new BusinessException("Duplicate seat in request: "+passengerReq.getSeatNumber());
             }
         }
     }
+
+
     
     
     private String generateRandomPNR() 

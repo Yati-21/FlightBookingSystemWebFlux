@@ -38,7 +38,6 @@ public class FlightControllerReactive
 
     //serach flight using to from date
     @PostMapping("/flights/search")
-    @ResponseStatus(HttpStatus.CREATED)
     public Flux<Flight> searchFlights(@RequestBody @Valid FlightSearchRequest request) 
     {
         return service.searchFlights(request.getFrom(),request.getTo(),request.getDate());
@@ -54,7 +53,6 @@ public class FlightControllerReactive
     //add booking
     @PostMapping("/bookings/create")
     @ResponseStatus(HttpStatus.CREATED)
-
     public Mono<String> createBooking(@RequestBody @Valid BookingRequest request) 
     {
         return service.bookTicket(request.getFlightId(),request);

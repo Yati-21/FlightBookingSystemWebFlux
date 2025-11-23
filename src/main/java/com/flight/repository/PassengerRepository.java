@@ -1,7 +1,5 @@
 package com.flight.repository;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +16,6 @@ public interface PassengerRepository extends ReactiveMongoRepository<Passenger,S
     Flux<Passenger> findByBookingId(String bookingId);
 
     Mono<Void> deleteByBookingId(String bookingId);
-    
 //    Flux<Passenger> findByBookingIdIn(List<String> bookingIds);
 
 }

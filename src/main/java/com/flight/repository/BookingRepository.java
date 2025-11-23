@@ -17,5 +17,5 @@ public interface BookingRepository extends ReactiveMongoRepository<Booking,Strin
     
 	Flux<Booking> findByFlightId(String flightId); // get all bookings for a particular flight
     
-//	Mono<Boolean> existsByPnr(String pnr);   //check if pnr already exists to remove collisions
+	Mono<Boolean> existsByPnr(String pnr);   //check if pnr already exists to remove collisions
 }
