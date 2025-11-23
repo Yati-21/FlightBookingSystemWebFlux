@@ -74,6 +74,12 @@ public class FlightControllerReactive
     {
         return service.cancelBooking(pnr);
     }
+    
+    @GetMapping("/bookings/history/email/{email}")
+    public Flux<Booking> getBookingHistoryByEmail(@PathVariable String email) {
+        return service.getBookingHistoryByEmail(email);
+    }
+
 
     //all bookings done by a user - using user id 
     @GetMapping("/bookings/history/user/{userId}")
@@ -81,7 +87,6 @@ public class FlightControllerReactive
     {
         return service.getBookingHistoryByUserId(userId);
     }
-
 
     //get all flights of particular airline - enter airline code
     @GetMapping("/airlines/{code}/flights")

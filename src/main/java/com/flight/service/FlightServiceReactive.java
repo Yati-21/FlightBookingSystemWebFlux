@@ -26,6 +26,8 @@ public interface FlightServiceReactive
     Flux<Booking> getBookingHistoryByUserId(String userId);
 
     Mono<Void> cancelBooking(String pnr);
+    
+    Flux<Booking> getBookingHistoryByEmail(String email);
 
     Flux<Flight> getFlightsByAirline(String airlineCode);
 }

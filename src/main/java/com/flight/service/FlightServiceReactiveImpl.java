@@ -229,6 +229,15 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     
 
     @Override
+    public Flux<Booking> getBookingHistoryByEmail(String email) 
+    {
+        return userRepo.findByEmail(email)
+                .switchIfEmpty(Mono.error(new NotFoundException("User not found with email: "+email)))
+                .flatMapMany(user->bookingRepo.findByUserId(user.getId()));
+    }
+
+    
+    @Override
     public Flux<Flight> getFlightsByAirline(String airlineCode) 
     {
         return flightRepo.findByAirlineCode(airlineCode);
