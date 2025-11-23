@@ -3,7 +3,6 @@ package com.flight.controller;
 import com.flight.entity.Booking;
 import com.flight.entity.Flight;
 import com.flight.request.BookingRequest;
-import com.flight.request.FlightCreateRequest;
 import com.flight.request.FlightSearchRequest;
 import com.flight.service.FlightServiceReactive;
 
@@ -32,10 +31,10 @@ public class FlightControllerReactive
     //add a new flight
     @PostMapping("/flights/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Flight> addFlight(@RequestBody @Valid FlightCreateRequest request) 
-    {
-        return service.addFlight(request);
+    public Mono<Flight> addFlight(@RequestBody @Valid Flight flight) {
+        return service.addFlight(flight);
     }
+
 
     //serach flight using to from date
     @PostMapping("/flights/search")

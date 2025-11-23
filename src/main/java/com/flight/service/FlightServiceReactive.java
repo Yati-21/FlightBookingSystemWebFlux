@@ -4,7 +4,6 @@ import com.flight.entity.AirportCode;
 import com.flight.entity.Booking;
 import com.flight.entity.Flight;
 import com.flight.request.BookingRequest;
-import com.flight.request.FlightCreateRequest;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,7 +13,7 @@ import java.time.LocalDate;
 public interface FlightServiceReactive 
 {
 
-    Mono<Flight> addFlight(FlightCreateRequest request);
+    Mono<Flight> addFlight(Flight flight);
 
     Flux<Flight> searchFlights(AirportCode from, AirportCode to, LocalDate date);
 

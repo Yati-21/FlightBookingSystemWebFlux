@@ -15,15 +15,15 @@ public enum AirportCode
     AMD,
     COK;
 
-    public static AirportCode fromString(String code) 
-    {
-        try 
-        {
-            return AirportCode.valueOf(code.toUpperCase());
-        } 
-        catch (IllegalArgumentException ex) 
-        {
-            throw new BusinessException("Invalid airport code: "+code);
-        }
-    }
+//    public static AirportCode fromString(String code) 
+//    {
+//        try 
+//        {
+//            return AirportCode.valueOf(code.toUpperCase());
+//        } 
+//        catch (IllegalArgumentException ex) 
+//        {
+//            throw new BusinessException("Invalid airport code: "+code);
+//        }
+//    }
 }

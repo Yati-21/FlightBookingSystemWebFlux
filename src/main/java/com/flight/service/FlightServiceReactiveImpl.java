@@ -10,7 +10,6 @@ import com.flight.repository.FlightRepository;
 import com.flight.repository.PassengerRepository;
 import com.flight.repository.UserRepository;
 import com.flight.request.BookingRequest;
-import com.flight.request.FlightCreateRequest;
 import com.flight.request.PassengerRequest;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,32 +49,22 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     private UserRepository userRepo;
 
     @Override
-    public Mono<Flight> addFlight(FlightCreateRequest req) 
+    public Mono<Flight> addFlight(Flight flight) 
     {
-        return airlineRepo.findById(req.getAirlineCode())
+    	return airlineRepo.findById(flight.getAirlineCode())
                 .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
-                .flatMap(airline-> 
-                {
-                    LocalDateTime now=LocalDateTime.now();
-                    if (req.getDepartureTime().isBefore(now)) 
-                    {
-                        return Mono.error(new BusinessException("Flight departure must be in future"));
+                .flatMap(al -> {
+
+                    if (flight.getArrivalTime().isBefore(flight.getDepartureTime())) {
+                        return Mono.error(new BusinessException("Arrival time must be after departure time"));
                     }
-                    if (req.getArrivalTime().isBefore(req.getDepartureTime())) 
-                    {
-                        return Mono.error(new BusinessException("Arrival must be after departure"));
+
+                    if (flight.getDepartureTime().isBefore(LocalDateTime.now())) {
+                        return Mono.error(new BusinessException("Flight departure time must be in the future"));
                     }
-                    Flight flight = new Flight();
-                    flight.setAirlineCode(req.getAirlineCode());
-                    flight.setFlightNumber(req.getFlightNumber());
-                    flight.setFromCity(req.getFromCity());
-                    flight.setToCity(req.getToCity());
-                    flight.setDepartureTime(req.getDepartureTime());
-                    flight.setArrivalTime(req.getArrivalTime());
-                    flight.setTotalSeats(req.getTotalSeats());
-                    flight.setAvailableSeats(req.getTotalSeats());
-                    flight.setPrice(req.getPrice());
-                    flight.setStatus(req.getStatus());
+
+                    flight.setId(null); //client cant override id
+                    flight.setAvailableSeats(flight.getTotalSeats());
 
                     return flightRepo.save(flight);
                 });
@@ -141,11 +130,8 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                 .flatMap(savedBooking ->
                     savePassengersAndCollectIds(savedBooking.getId(), req.getPassengers())
                         .flatMap(passengerIds -> {
-
                             savedBooking.setPassengerIds(passengerIds);
-
                             flight.setAvailableSeats(flight.getAvailableSeats()-req.getSeatsBooked());
-
                             return bookingRepo.save(savedBooking)
                                     .then(flightRepo.save(flight))
                                     .thenReturn(savedBooking.getPnr());
