@@ -1,5 +1,6 @@
 package com.flight.entity;
 
-public class FlightStatus {
-
+public enum FlightStatus {
+    SCHEDULED,
+    CANCELLED
 }

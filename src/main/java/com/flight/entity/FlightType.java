@@ -1,5 +1,6 @@
 package com.flight.entity;
 
-public class FlightType {
-
+public enum FlightType {
+    ONE_WAY,
+    ROUND_TRIP
 }
