@@ -48,6 +48,21 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     @Override
     public Mono<Flight> addFlight(Flight flight) 
     {
+    	
+    	LocalDateTime now = LocalDateTime.now();
+
+        //check flight must have future departure
+        if (flight.getDepartureTime().isBefore(now)) 
+        {
+            return Mono.error(new BusinessException("Flight departure time must be in the future"));
+        }
+
+        //check arrival >departure
+        if (flight.getArrivalTime().isBefore(flight.getDepartureTime())) 
+        {
+            return Mono.error(new BusinessException("Arrival time must be after departure time"));
+        }
+    	
         //when a flight is created total = available seats
         flight.setAvailableSeats(flight.getTotalSeats());
         return flightRepo.save(flight);
@@ -193,28 +208,7 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                 });
     }
     
-        private Mono<Void> checkSeatConflicts(String flightId, List<PassengerRequest> newPassengers, String excludeBookingId) 
-    {
-        return bookingRepo.findByFlightId(flightId)
-                .filter(b->!b.getId().equals(excludeBookingId))
-                .flatMap(b ->passengerRepo.findByBookingId(b.getId()))
-                .map(Passenger::getSeatNumber)
-                .collectList()
-                .flatMap(existingSeats-> 
-                {
-                    for (PassengerRequest passengerReq :newPassengers) 
-                    {
-                        if (existingSeats.contains(passengerReq.getSeatNumber())) 
-                        {
-                            return Mono.error(new SeatUnavailableException("Seat already booked: "+passengerReq.getSeatNumber()));
-                        }
-                    }
-                    return Mono.empty();
-                });
-    }
-
-
-
+    
     private void validatePassengerDuplicateRequest(List<PassengerRequest> passengers) 
     {
         Set<String> set=new HashSet<>();
