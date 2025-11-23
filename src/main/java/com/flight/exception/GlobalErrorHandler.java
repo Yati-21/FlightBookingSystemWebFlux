@@ -1,5 +1,6 @@
 package com.flight.exception;
 
-public class GlobalErrorHandler {
+public class GlobalErrorHandler 
+{
 
 }

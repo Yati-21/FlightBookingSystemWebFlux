@@ -174,15 +174,55 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
 
 
 
+
+
+    private Mono<Void> checkSeatConflicts(String flightId, List<PassengerRequest> newPassengers) 
+    {
+        return bookingRepo.findByFlightId(flightId)
+                .flatMap(booking-> passengerRepo.findByBookingId(booking.getId())).map(Passenger::getSeatNumber).collectList()
+                .flatMap(existingSeats-> 
+                {
+                    for (PassengerRequest passengerReq :newPassengers) 
+                    {
+                        if (existingSeats.contains(passengerReq.getSeatNumber())) 
+                        {
+                            return Mono.error(new SeatUnavailableException("Seat already booked: "+passengerReq.getSeatNumber()));
+                        }
+                    }
+                    return Mono.empty();
+                });
+    }
+    
+        private Mono<Void> checkSeatConflicts(String flightId, List<PassengerRequest> newPassengers, String excludeBookingId) 
+    {
+        return bookingRepo.findByFlightId(flightId)
+                .filter(b->!b.getId().equals(excludeBookingId))
+                .flatMap(b ->passengerRepo.findByBookingId(b.getId()))
+                .map(Passenger::getSeatNumber)
+                .collectList()
+                .flatMap(existingSeats-> 
+                {
+                    for (PassengerRequest passengerReq :newPassengers) 
+                    {
+                        if (existingSeats.contains(passengerReq.getSeatNumber())) 
+                        {
+                            return Mono.error(new SeatUnavailableException("Seat already booked: "+passengerReq.getSeatNumber()));
+                        }
+                    }
+                    return Mono.empty();
+                });
+    }
+
+
+
     private void validatePassengerDuplicateRequest(List<PassengerRequest> passengers) 
     {
         Set<String> set=new HashSet<>();
-
-        for (PassengerRequest p:passengers) {
-            String key=p.getName()+"-"+p.getAge() +"-"+p.getGender();
+        for (PassengerRequest passengerReq:passengers) {
+            String key=passengerReq.getName()+"-"+passengerReq.getAge() +"-"+passengerReq.getGender();
             if (!set.add(key)) 
             {
-                throw new BusinessException("Duplicate passenger: "+p.getName());
+                throw new BusinessException("Duplicate passenger: "+passengerReq.getName());
             }
         }
     }

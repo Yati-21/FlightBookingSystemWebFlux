@@ -59,12 +59,12 @@ public class FlightControllerReactive
         return service.getTicket(pnr);
     }
 
-    //update booking
-    @PutMapping("/bookings/update/{pnr}")
-    public Mono<Booking> updateBooking(@PathVariable String pnr,@RequestBody @Valid BookingRequest request) 
-    {
-        return service.updateBooking(pnr,request);
-    }
+//    //update booking
+//    @PutMapping("/bookings/update/{pnr}")
+//    public Mono<Booking> updateBooking(@PathVariable String pnr,@RequestBody @Valid BookingRequest request) 
+//    {
+//        return service.updateBooking(pnr,request);
+//    }
 
     //cancel booking
     @DeleteMapping("/bookings/cancel/{pnr}")
