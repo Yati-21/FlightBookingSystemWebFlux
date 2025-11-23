@@ -1,7 +1,6 @@
 package com.flight.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,8 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "flights")
-public class Flight {
-
+public class Flight 
+{
     @Id
     private String id;
 

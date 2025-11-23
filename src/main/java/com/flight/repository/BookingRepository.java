@@ -11,8 +11,11 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface BookingRepository extends ReactiveMongoRepository<Booking,String> 
 {
-	Mono<Booking> findByPnr(String pnr);
-    Flux<Booking> findByUserId(String userId);
-    Flux<Booking> findByFlightId(String flightId);
-    Mono<Boolean> existsByPnr(String pnr);
+	Mono<Booking> findByPnr(String pnr);  //find booking using unique pnr code
+    
+	Flux<Booking> findByUserId(String userId);  //get all bookings of a prticular user
+    
+	Flux<Booking> findByFlightId(String flightId); // get all bookings for a particular flight
+    
+	Mono<Boolean> existsByPnr(String pnr);   //check if pnr already exists to remove collisions
 }
