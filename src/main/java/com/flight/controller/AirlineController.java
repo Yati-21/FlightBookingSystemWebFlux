@@ -3,6 +3,8 @@ package com.flight.controller;
 import com.flight.entity.Airline;
 import com.flight.exception.NotFoundException;
 import com.flight.repository.AirlineRepository;
+import com.flight.request.AirlineUpdateRequest;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,16 +40,17 @@ public class AirlineController
     }
 
     @PutMapping("/{code}")
-    public Mono<Airline> updateAirline(@PathVariable String code, @RequestBody @Valid Airline airline) 
+    public Mono<Airline> updateAirline(@PathVariable String code,@RequestBody @Valid AirlineUpdateRequest req) 
     {
         return airlineRepo.findById(code)
                 .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
                 .flatMap(existing-> 
                 {
-                    existing.setName(airline.getName());
+                    existing.setName(req.getName());
                     return airlineRepo.save(existing);
                 });
     }
+
 
     @DeleteMapping("/{code}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

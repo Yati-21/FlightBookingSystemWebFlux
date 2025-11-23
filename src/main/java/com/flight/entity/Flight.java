@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -53,13 +55,14 @@ public class Flight
     @NotNull(message="status is required")
     private FlightStatus status;
 
-    
+    @JsonIgnore
     @AssertTrue(message="fromCity and toCity cannot be same or null")
     public boolean isDifferentCities() 
     {
         return fromCity!=null && toCity!=null && !fromCity.equals(toCity);
     }
 
+    @JsonIgnore
     @AssertTrue(message="arrivalTime must be after departureTime")
     public boolean isValidTimes() 
     {

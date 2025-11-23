@@ -3,6 +3,8 @@ package com.flight.controller;
 import com.flight.entity.User;
 import com.flight.exception.NotFoundException;
 import com.flight.repository.UserRepository;
+import com.flight.request.UserUpdateRequest;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,17 +39,17 @@ public class UserController
     }
 
     @PutMapping("/{id}")
-    public Mono<User> updateUser(@PathVariable String id, @RequestBody @Valid User user) 
-    {
+    public Mono<User> updateUser(@PathVariable String id,@RequestBody @Valid UserUpdateRequest req) {
         return userRepo.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
-                .flatMap(existing->
+                .flatMap(existing-> 
                 {
-                    existing.setName(user.getName());
-                    existing.setEmail(user.getEmail());
+                    existing.setName(req.getName());
+                    existing.setEmail(req.getEmail());
                     return userRepo.save(existing);
                 });
     }
+    
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
