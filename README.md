@@ -1,4 +1,3 @@
-![er diagram](https://github.com/user-attachments/assets/0fafdae6-ac7d-4163-ada8-f9e6b071e7b5)
 # FLIGHT BOOKING SYSTEM
 
 ### A fully reactive, non-blocking backend built with Spring Boot WebFlux and Reactive MongoDB for managing flights, bookings, users, and airlines.
@@ -10,9 +9,16 @@
 
 ### Table of Contents
 
+* [System Architecture](#system-architecture)
 * [Key Features](#key-features)
 * [Technical Highlights](#technical-highlights)
 * [Documentation](#documentation)
+
+---
+
+### System Architecture
+
+![er diagram](https://github.com/user-attachments/assets/0fafdae6-ac7d-4163-ada8-f9e6b071e7b5)
 
 ---
 
