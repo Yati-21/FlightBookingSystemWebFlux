@@ -31,22 +31,30 @@ public class AirlineController
         return airlineRepo.save(airline);
     }
 
+
     @GetMapping
     public Flux<Airline> getAllAirlines() 
     {
         return airlineRepo.findAll();
     }
 
+    @GetMapping("/{code}")
+    public Mono<Airline> getAirlineById(@PathVariable String code) 
+    {
+    	return airlineRepo.findById(code)
+    			.switchIfEmpty(Mono.error(new NotFoundException("Airline not found")));
+    }
+
     @PutMapping("/{code}")
     public Mono<Airline> updateAirline(@PathVariable String code,@RequestBody @Valid AirlineUpdateRequest req) 
     {
         return airlineRepo.findById(code)
-                .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
-                .flatMap(existing-> 
-                {
-                    existing.setName(req.getName());
-                    return airlineRepo.save(existing);
-                });
+            .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
+            .flatMap(existing-> 
+            {
+                existing.setName(req.getName());
+                return airlineRepo.save(existing);
+            });
     }
 
 

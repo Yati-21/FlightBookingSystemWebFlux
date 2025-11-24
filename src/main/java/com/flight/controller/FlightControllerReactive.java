@@ -79,14 +79,14 @@ public class FlightControllerReactive
     }
 
 
-    //all bookings done by a user - using user id 
+    //all bookings done by a user using user id 
     @GetMapping("/bookings/history/user/{userId}")
     public Flux<Booking> getUserBookings(@PathVariable String userId) 
     {
         return service.getBookingHistoryByUserId(userId);
     }
 
-    //get all flights of particular airline - enter airline code
+    //get all flights of particular airline enter airline code
     @GetMapping("/airlines/{code}/flights")
     public Flux<Flight> getFlightsByAirline(@PathVariable String code) {
         return service.getFlightsByAirline(code);

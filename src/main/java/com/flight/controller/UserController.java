@@ -30,6 +30,11 @@ public class UserController
         return userRepo.save(user);
     }
 
+    @GetMapping
+    public Flux<User> getAllUsers() 
+    {
+    	return userRepo.findAll();
+    }
 
     @GetMapping("/{id}")
     public Mono<User> getUser(@PathVariable String id) 
@@ -37,11 +42,6 @@ public class UserController
         return userRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException("User not found")));
     }
 
-    @GetMapping
-    public Flux<User> getAllUsers() 
-    {
-        return userRepo.findAll();
-    }
 
     @PutMapping("/{id}")
     public Mono<User> updateUser(@PathVariable String id,@RequestBody @Valid UserUpdateRequest req) {
