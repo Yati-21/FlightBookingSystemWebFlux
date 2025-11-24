@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.flight.entity.AirportCode;
@@ -39,20 +38,21 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
 
     private static final int CANCELLATION_LIMIT_HOURS=24;
 
-    @Autowired
-    private FlightRepository flightRepo;
-
-    @Autowired
-    private BookingRepository bookingRepo;
-
-    @Autowired
-    private PassengerRepository passengerRepo;
+    private final FlightRepository flightRepo;
+    private final BookingRepository bookingRepo;
+    private final PassengerRepository passengerRepo;
+    private final AirlineRepository airlineRepo;
+    private final UserRepository userRepo;
     
-    @Autowired
-    private AirlineRepository airlineRepo;
-
-    @Autowired
-    private UserRepository userRepo;
+    public FlightServiceReactiveImpl(FlightRepository flightRepo,BookingRepository bookingRepo,
+    		PassengerRepository passengerRepo,AirlineRepository airlineRepo,UserRepository userRepo) 
+    {
+        this.flightRepo =flightRepo;
+        this.bookingRepo= bookingRepo;
+        this.passengerRepo= passengerRepo;
+        this.airlineRepo= airlineRepo;
+        this.userRepo= userRepo;
+    }
 
     @Override
     public Mono<Flight> addFlight(Flight flight) 

@@ -7,7 +7,6 @@ import com.flight.request.AirlineCreateRequest;
 import com.flight.request.AirlineUpdateRequest;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -18,10 +17,16 @@ import reactor.core.publisher.Mono;
 public class AirlineController 
 {
 
-	private static final String AIRLINE_NOT_FOUND ="Airline not found"
-			;
-    @Autowired
-    private AirlineRepository airlineRepo;
+	private static final String AIRLINE_NOT_FOUND ="Airline not found";
+	
+	
+	//using constructor injection instead of autowired -- issue by sonarqube
+	private final AirlineRepository airlineRepo;
+    public AirlineController(AirlineRepository airlineRepo) 
+    {
+        this.airlineRepo=airlineRepo;
+    }
+    
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

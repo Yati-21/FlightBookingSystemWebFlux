@@ -9,7 +9,6 @@ import com.flight.service.FlightServiceReactive;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import reactor.core.publisher.Flux;
@@ -24,10 +23,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping("/")
 public class FlightControllerReactive 
 {
+	//using constructor injection instead of autowired - sonarqube suggestion
+	private final FlightServiceReactive service;
+    public FlightControllerReactive(FlightServiceReactive service) 
+    {
+        this.service=service;
+    }
 
-    @Autowired
-    private FlightServiceReactive service;
-
+    
     //add a new flight
     @PostMapping("/flights/add")
     @ResponseStatus(HttpStatus.CREATED)

@@ -7,7 +7,6 @@ import com.flight.request.UserCreateRequest;
 import com.flight.request.UserUpdateRequest;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -18,8 +17,13 @@ import reactor.core.publisher.Mono;
 public class UserController 
 {
 	private static final String USER_NOT_FOUND="User not found";
-    @Autowired
-    private UserRepository userRepo;
+
+	//using constructor injection instead of autowired - sonarqube suggestion
+	private final UserRepository userRepo;
+    public UserController(UserRepository userRepo) 
+    {
+        this.userRepo =userRepo;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
