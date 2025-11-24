@@ -68,7 +68,7 @@ class UserControllerTest
         req.setName("abc update");
         req.setEmail("abc2@test.com");
 
-        User update=new User("user1", req.getName(),req.getEmail());
+        User update=new User("user1",req.getName(),req.getEmail());
 
         when(userRepo.findById("user1")).thenReturn(Mono.just(sampleUser));
         when(userRepo.save(any(User.class))).thenReturn(Mono.just(update));

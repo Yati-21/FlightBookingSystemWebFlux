@@ -18,6 +18,8 @@ import reactor.core.publisher.Mono;
 public class AirlineController 
 {
 
+	private static final String AIRLINE_NOT_FOUND ="Airline not found"
+			;
     @Autowired
     private AirlineRepository airlineRepo;
 
@@ -42,14 +44,14 @@ public class AirlineController
     public Mono<Airline> getAirlineById(@PathVariable String code) 
     {
     	return airlineRepo.findById(code)
-    			.switchIfEmpty(Mono.error(new NotFoundException("Airline not found")));
+    			.switchIfEmpty(Mono.error(new NotFoundException(AIRLINE_NOT_FOUND)));
     }
 
     @PutMapping("/{code}")
     public Mono<Airline> updateAirline(@PathVariable String code,@RequestBody @Valid AirlineUpdateRequest req) 
     {
         return airlineRepo.findById(code)
-            .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
+            .switchIfEmpty(Mono.error(new NotFoundException(AIRLINE_NOT_FOUND)))
             .flatMap(existing-> 
             {
                 existing.setName(req.getName());
@@ -62,7 +64,7 @@ public class AirlineController
     public Mono<Void> deleteAirline(@PathVariable String code) 
     {
         return airlineRepo.findById(code)
-                .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
+                .switchIfEmpty(Mono.error(new NotFoundException(AIRLINE_NOT_FOUND)))
                 .flatMap(existing->airlineRepo.deleteById(code));
     }
 }

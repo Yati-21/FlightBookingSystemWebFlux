@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/users")
 public class UserController 
 {
+	private static final String USER_NOT_FOUND="User not found";
     @Autowired
     private UserRepository userRepo;
 
@@ -39,14 +40,14 @@ public class UserController
     @GetMapping("/{id}")
     public Mono<User> getUser(@PathVariable String id) 
     {
-        return userRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException("User not found")));
+        return userRepo.findById(id).switchIfEmpty(Mono.error(new NotFoundException(USER_NOT_FOUND)));
     }
 
 
     @PutMapping("/{id}")
     public Mono<User> updateUser(@PathVariable String id,@RequestBody @Valid UserUpdateRequest req) {
         return userRepo.findById(id)
-                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .switchIfEmpty(Mono.error(new NotFoundException(USER_NOT_FOUND)))
                 .flatMap(existing-> 
                 {
                     existing.setName(req.getName());
@@ -60,7 +61,7 @@ public class UserController
     public Mono<Void> deleteUser(@PathVariable String id) 
     {
         return userRepo.findById(id)
-                .switchIfEmpty(Mono.error(new NotFoundException("User not found")))
+                .switchIfEmpty(Mono.error(new NotFoundException(USER_NOT_FOUND)))
                 .flatMap(u->userRepo.deleteById(id));
     }
 }

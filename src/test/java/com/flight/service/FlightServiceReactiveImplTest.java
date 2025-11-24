@@ -1,7 +1,6 @@
 package com.flight.service;
 
 import com.flight.entity.*;
-import com.flight.exception.BusinessException;
 import com.flight.repository.*;
 import com.flight.request.BookingRequest;
 import com.flight.request.PassengerRequest;
@@ -26,7 +25,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class FlightServiceReactiveImplTest 
+class FlightServiceReactiveImplTest 
 {
     @Mock
     private FlightRepository flightRepo;
@@ -68,16 +67,6 @@ public class FlightServiceReactiveImplTest
         when(flightRepo.save(any())).thenReturn(Mono.just(validFlight));
         StepVerifier.create(service.addFlight(validFlight)).expectNext(validFlight).verifyComplete();
     }
-
-    
-//    @Test
-//    void testAddFlightArrivalBeforeDeparture() 
-//    {
-//        validFlight.setArrivalTime(validFlight.getDepartureTime().minusHours(1));
-//        when(airlineRepo.findById("ai")).thenReturn(Mono.just(new Airline("ai" ,"air india")));
-//        StepVerifier.create(service.addFlight(validFlight)).expectErrorMatches(ex-> ex instanceof BusinessException&&ex.getMessage().contains("Arrival time must be after departure time")).verify();
-//    }
-
 
     //searchFlights()
     @Test
