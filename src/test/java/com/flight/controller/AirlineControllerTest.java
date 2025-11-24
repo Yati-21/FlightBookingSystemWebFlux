@@ -20,9 +20,8 @@ import static org.mockito.Mockito.when;
 
 @org.springframework.boot.webflux.test.autoconfigure.WebFluxTest(controllers=AirlineController.class)
 @Import(GlobalErrorHandler.class)
-class AirlineControllerTest {
-	
-
+class AirlineControllerTest 
+{
     @Autowired
     private WebTestClient webTestClient;
 

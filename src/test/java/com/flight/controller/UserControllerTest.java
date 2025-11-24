@@ -51,7 +51,6 @@ class UserControllerTest
                 .jsonPath("$.id").isEqualTo("user1").jsonPath("$.name").isEqualTo("abc");
     }
 
-
     @Test
     void getUserSuccess() 
     {

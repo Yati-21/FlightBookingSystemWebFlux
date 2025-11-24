@@ -2,7 +2,6 @@ package com.flight.service;
 
 import com.flight.entity.*;
 import com.flight.exception.BusinessException;
-import com.flight.exception.NotFoundException;
 import com.flight.repository.*;
 import com.flight.request.BookingRequest;
 import com.flight.request.PassengerRequest;
@@ -194,4 +193,31 @@ public class FlightServiceReactiveImplTest
         when(flightRepo.findByAirlineCode("ai")).thenReturn(Flux.just(validFlight));
         StepVerifier.create(service.getFlightsByAirline("ai")).expectNext(validFlight).verifyComplete();
     }
+    
+    
+    @Test
+    void testGetTicketSuccess() 
+    {
+        Booking booking=new Booking();
+        booking.setPnr("PNR1");
+        booking.setId("B1");
+        when(bookingRepo.findByPnr("PNR1")).thenReturn(Mono.just(booking));
+        StepVerifier.create(service.getTicket("PNR1")).expectNextMatches(b->b.getPnr().equals("PNR1")).verifyComplete();
+        verify(bookingRepo).findByPnr("PNR1");
+    }
+
+    @Test
+    void testGetBookingHistoryByUserIdSuccess() 
+    {
+        Booking booking=new Booking();
+        booking.setId("B1");
+        booking.setUserId("user1");
+        booking.setPnr("PNR123");
+        when(bookingRepo.findByUserId("user1")).thenReturn(Flux.just(booking));
+        StepVerifier.create(service.getBookingHistoryByUserId("user1")).expectNext(booking).verifyComplete();
+        verify(bookingRepo).findByUserId("user1");
+    }
+
+    
+    
 }
