@@ -1,7 +1,9 @@
 package com.flight.controller;
 
 import com.flight.entity.*;
+import com.flight.request.BookingRequest;
 import com.flight.request.FlightSearchRequest;
+import com.flight.request.PassengerRequest;
 import com.flight.service.FlightServiceReactive;
 import com.flight.exception.GlobalErrorHandler;
 import com.flight.exception.NotFoundException;
@@ -19,8 +21,10 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers=FlightControllerReactive.class)
@@ -64,8 +68,7 @@ class FlightControllerReactiveTest
     {
         when(service.addFlight(any(Flight.class))).thenReturn(Mono.just(testFlight));
         webTestClient.post().uri("/flights/add").contentType(MediaType.APPLICATION_JSON).bodyValue(testFlight)
-            .exchange().expectStatus().isCreated().expectBody()
-            .jsonPath("$.id").isEqualTo("F1");
+            .exchange().expectStatus().isCreated().expectBody(String.class).isEqualTo("F1");
     }
 
     @Test
@@ -85,8 +88,7 @@ class FlightControllerReactiveTest
         req.setDate(LocalDate.now().plusDays(1));
         when(service.searchFlights(AirportCode.DEL,AirportCode.BOM,req.getDate())).thenReturn(Flux.just(testFlight));
         webTestClient.post().uri("/flights/search").contentType(MediaType.APPLICATION_JSON).bodyValue(req)
-                .exchange().expectStatus().isOk().expectBody()
-                .jsonPath("$[0].id").isEqualTo("F1");
+                .exchange().expectStatus().isOk().expectBodyList(String.class).hasSize(1).contains("F1");
     }
 
     @Test
@@ -98,29 +100,35 @@ class FlightControllerReactiveTest
             .jsonPath("$.flightNumber").isEqualTo("AI100");
     }
 
-//    @Test
-//    void createBookingSuccess() 
-//    {
-//        BookingRequest req=new BookingRequest();
-//        req.setFlightId("F1");
-//        req.setUserId("user1");
-//        req.setSeatsBooked(1);
-//        req.setMealType(MealType.VEG);
-//        req.setFlightType(FlightType.ONE_WAY);
-//
-//        PassengerRequest passReq1=new PassengerRequest();
-//        passReq1.setName("pass1");
-//        passReq1.setGender(Gender.M);
-//        passReq1.setAge(30);
-//        passReq1.setSeatNumber("A1");
-//
-//        req.setPassengers(List.of(passReq1));
-//
-//        when(service.bookTicket("F1",req)).thenReturn(Mono.just("pnr123"));
-//        webTestClient.post().uri("/bookings/create").contentType(MediaType.APPLICATION_JSON).bodyValue(req)
-//            .exchange()
-//            .expectStatus().isCreated().expectBody().jsonPath("$").isEqualTo("pnr123");
-//    }
+    @Test
+    void createBookingSuccess() {
+
+        BookingRequest req=new BookingRequest();
+        req.setFlightId("F1");
+        req.setUserId("user1");
+        req.setSeatsBooked(1);
+        req.setMealType(MealType.VEG);
+        req.setFlightType(FlightType.ONE_WAY);
+
+        PassengerRequest p=new PassengerRequest();
+        p.setName("A");
+        p.setGender(Gender.M);
+        p.setAge(22);
+        p.setSeatNumber("A1");
+
+        req.setPassengers(List.of(p));
+
+        when(service.bookTicket(eq("F1"),any(BookingRequest.class))).thenReturn(Mono.just("pnr123"));
+
+        webTestClient.post()
+                .uri("/bookings/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(req)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(String.class).isEqualTo("pnr123");
+    }
+
 
     @Test
     void getBookingSuccess() 

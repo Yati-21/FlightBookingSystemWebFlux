@@ -46,9 +46,7 @@ class AirlineControllerTest
 
         webTestClient.post()
                 .uri("/airlines").contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(req).exchange().expectStatus().isCreated().expectBody()
-                .jsonPath("$.code").isEqualTo("AI")
-                .jsonPath("$.name").isEqualTo("Air india");
+                .bodyValue(req).exchange().expectStatus().isCreated().expectBody(String.class).isEqualTo("AI");
     }
 
     @Test
@@ -83,7 +81,7 @@ class AirlineControllerTest
     {
         when(airlineRepo.findById("AI")).thenReturn(Mono.just(sample));
         when(airlineRepo.deleteById("AI")).thenReturn(Mono.empty());
-        webTestClient.delete().uri("/airlines/AI").exchange().expectStatus().isNoContent();
+        webTestClient.delete().uri("/airlines/AI").exchange().expectStatus().isOk();
     }
 
 

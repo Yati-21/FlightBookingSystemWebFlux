@@ -31,16 +31,16 @@ public class FlightControllerReactive
     //add a new flight
     @PostMapping("/flights/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Flight> addFlight(@RequestBody @Valid Flight flight) {
-        return service.addFlight(flight);
+    public Mono<String> addFlight(@RequestBody @Valid Flight flight) {
+        return service.addFlight(flight).map(Flight::getId);
     }
 
 
     //serach flight using to from date
     @PostMapping("/flights/search")
-    public Flux<Flight> searchFlights(@RequestBody @Valid FlightSearchRequest request) 
+    public Flux<String> searchFlights(@RequestBody @Valid FlightSearchRequest request) 
     {
-        return service.searchFlights(request.getFrom(),request.getTo(),request.getDate());
+        return service.searchFlights(request.getFrom(),request.getTo(),request.getDate()).map(Flight::getId);
     }
 
     //get particular flight using flightid

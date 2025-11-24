@@ -23,12 +23,12 @@ public class AirlineController
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Airline> createAirline(@RequestBody @Valid AirlineCreateRequest req) 
+    public Mono<String> createAirline(@RequestBody @Valid AirlineCreateRequest req) 
     {
         Airline airline=new Airline();
         airline.setCode(req.getCode());
         airline.setName(req.getName());
-        return airlineRepo.save(airline);
+        return airlineRepo.save(airline).map(Airline::getCode);
     }
 
 
@@ -59,7 +59,6 @@ public class AirlineController
 
 
     @DeleteMapping("/{code}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteAirline(@PathVariable String code) 
     {
         return airlineRepo.findById(code)

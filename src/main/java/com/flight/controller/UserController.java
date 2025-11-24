@@ -22,12 +22,12 @@ public class UserController
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<User> createUser(@RequestBody @Valid UserCreateRequest req) 
+    public Mono<String> createUser(@RequestBody @Valid UserCreateRequest req) 
     {
         User user =new User();
         user.setName(req.getName());
         user.setEmail(req.getEmail());
-        return userRepo.save(user);
+        return userRepo.save(user).map(User::getId);
     }
 
     @GetMapping
@@ -57,7 +57,6 @@ public class UserController
     
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteUser(@PathVariable String id) 
     {
         return userRepo.findById(id)

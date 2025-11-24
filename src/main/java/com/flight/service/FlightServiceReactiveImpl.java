@@ -59,10 +59,13 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
     {
     	return airlineRepo.findById(flight.getAirlineCode())
                 .switchIfEmpty(Mono.error(new NotFoundException("Airline not found")))
-                .flatMap(al -> {
-
+                .flatMap(al -> 
+                {
+                	if (flight.getFromCity().equals(flight.getToCity())) {
+                        return Mono.error(new BusinessException("source and destination must be different"));
+                    }
                     if (flight.getArrivalTime().isBefore(flight.getDepartureTime())) {
-                        return Mono.error(new BusinessException("Arrival time must be after departure time"));
+                        return Mono.error(new BusinessException("arrival time must be after departure time"));
                     }
 
                     if (flight.getDepartureTime().isBefore(LocalDateTime.now())) {

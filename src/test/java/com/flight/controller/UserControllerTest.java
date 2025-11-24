@@ -47,8 +47,8 @@ class UserControllerTest
         req.setEmail("abc@test.com");
         when(userRepo.save(any(User.class))).thenReturn(Mono.just(sampleUser));
         webTestClient.post().uri("/users").contentType(MediaType.APPLICATION_JSON).bodyValue(req)
-                .exchange().expectStatus().isCreated().expectBody()
-                .jsonPath("$.id").isEqualTo("user1").jsonPath("$.name").isEqualTo("abc");
+                .exchange().expectStatus().isCreated().expectBody(String.class)
+                .isEqualTo("user1");
     }
 
     @Test
@@ -85,7 +85,7 @@ class UserControllerTest
         when(userRepo.findById("user1")).thenReturn(Mono.just(sampleUser));
         when(userRepo.deleteById("user1")).thenReturn(Mono.empty());
 
-        webTestClient.delete().uri("/users/user1").exchange().expectStatus().isNoContent();
+        webTestClient.delete().uri("/users/user1").exchange().expectStatus().isOk();
     }
 
 }

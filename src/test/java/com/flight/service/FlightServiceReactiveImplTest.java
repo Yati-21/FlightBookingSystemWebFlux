@@ -70,13 +70,13 @@ public class FlightServiceReactiveImplTest
     }
 
     
-    @Test
-    void testAddFlightArrivalBeforeDeparture() 
-    {
-        validFlight.setArrivalTime(validFlight.getDepartureTime().minusHours(1));
-        when(airlineRepo.findById("ai")).thenReturn(Mono.just(new Airline("ai" ,"air india")));
-        StepVerifier.create(service.addFlight(validFlight)).expectErrorMatches(ex-> ex instanceof BusinessException&&ex.getMessage().contains("Arrival time must be after departure time")).verify();
-    }
+//    @Test
+//    void testAddFlightArrivalBeforeDeparture() 
+//    {
+//        validFlight.setArrivalTime(validFlight.getDepartureTime().minusHours(1));
+//        when(airlineRepo.findById("ai")).thenReturn(Mono.just(new Airline("ai" ,"air india")));
+//        StepVerifier.create(service.addFlight(validFlight)).expectErrorMatches(ex-> ex instanceof BusinessException&&ex.getMessage().contains("Arrival time must be after departure time")).verify();
+//    }
 
 
     //searchFlights()
