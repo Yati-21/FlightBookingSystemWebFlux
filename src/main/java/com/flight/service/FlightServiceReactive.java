@@ -1,6 +1,6 @@
 package com.flight.service;
 
-import com.flight.entity.AirportCode;
+import com.flight.entity.AIRPORT_CODE;
 import com.flight.entity.Booking;
 import com.flight.entity.Flight;
 import com.flight.request.BookingRequest;
@@ -12,10 +12,9 @@ import java.time.LocalDate;
 
 public interface FlightServiceReactive 
 {
-
     Mono<Flight> addFlight(Flight flight);
 
-    Flux<Flight> searchFlights(AirportCode from, AirportCode to, LocalDate date);
+    Flux<Flight> searchFlights(AIRPORT_CODE from, AIRPORT_CODE to, LocalDate date);
 
     Mono<Flight> getFlightById(String flightId);
 

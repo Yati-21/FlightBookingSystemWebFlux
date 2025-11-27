@@ -41,11 +41,10 @@ class GlobalErrorHandlerTest
     }
 
     @Test
-    void testHandleSeatUnavailable() {
+    void testHandleSeatUnavailable() 
+    {
         SeatUnavailableException ex=new SeatUnavailableException("Seat A1 unavailable");
-
         Mono<ResponseEntity<Map<String,String>>> result=handler.handleSeatUnavailable(ex);
-
         StepVerifier.create(result).assertNext(response -> 
         	{
                     assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
@@ -58,7 +57,6 @@ class GlobalErrorHandlerTest
     {
         BeanPropertyBindingResult binding=new BeanPropertyBindingResult(new Object(),"request");
         binding.addError(new FieldError("request","flightId","flightId is required"));
-
         WebExchangeBindException ex=new WebExchangeBindException(null,binding);
         Mono<ResponseEntity<Map<String,Object>>> result =handler.handleValidationErrors(ex);
         StepVerifier.create(result).assertNext(response-> 
@@ -74,7 +72,8 @@ class GlobalErrorHandlerTest
 
    
    @Test
-    void testHandleGeneralException() {
+    void testHandleGeneralException() 
+   {
         Exception ex=new Exception("Unexpected crash");
         Mono<ResponseEntity<Map<String,String>>> result =handler.handleGeneral(ex);
         StepVerifier.create(result).assertNext(response -> 

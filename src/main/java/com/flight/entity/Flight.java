@@ -29,10 +29,10 @@ public class Flight
     private String flightNumber;
 
     @NotNull(message="fromCity is required")
-    private AirportCode fromCity;
+    private AIRPORT_CODE fromCity;
 
     @NotNull(message="toCity is required")
-    private AirportCode toCity;
+    private AIRPORT_CODE toCity;
 
     @NotNull(message ="departureTime is required")
     private LocalDateTime departureTime;
@@ -50,6 +50,6 @@ public class Flight
     private float price;
 
     @NotNull(message="status is required")
-    private FlightStatus status;
+    private FLIGHT_STATUS status;
 
 }

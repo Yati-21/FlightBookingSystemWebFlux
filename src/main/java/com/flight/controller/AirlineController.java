@@ -16,9 +16,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/airlines")
 public class AirlineController 
 {
-
 	private static final String AIRLINE_NOT_FOUND ="Airline not found";
-	
 	
 	//using constructor injection instead of autowired -- issue by sonarqube
 	private final AirlineRepository airlineRepo;
@@ -26,7 +24,6 @@ public class AirlineController
     {
         this.airlineRepo=airlineRepo;
     }
-    
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -37,7 +34,6 @@ public class AirlineController
         airline.setName(req.getName());
         return airlineRepo.save(airline).map(Airline::getCode);
     }
-
 
     @GetMapping
     public Flux<Airline> getAllAirlines() 
@@ -63,7 +59,6 @@ public class AirlineController
                 return airlineRepo.save(existing);
             });
     }
-
 
     @DeleteMapping("/{code}")
     public Mono<Void> deleteAirline(@PathVariable String code) 

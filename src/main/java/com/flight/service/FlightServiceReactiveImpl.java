@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.flight.entity.AirportCode;
+import com.flight.entity.AIRPORT_CODE;
 import com.flight.entity.Booking;
 import com.flight.entity.Flight;
 import com.flight.entity.Passenger;
@@ -29,7 +29,6 @@ import com.flight.request.PassengerRequest;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 
 @Slf4j
 @Service
@@ -67,31 +66,26 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                     if (flight.getArrivalTime().isBefore(flight.getDepartureTime())) {
                         return Mono.error(new BusinessException("arrival time must be after departure time"));
                     }
-
                     if (flight.getDepartureTime().isBefore(LocalDateTime.now())) {
                         return Mono.error(new BusinessException("Flight departure time must be in the future"));
                     }
-
                     flight.setAvailableSeats(flight.getTotalSeats());
-
                     return flightRepo.save(flight);
                 });
     }
     
     
     @Override
-    public Flux<Flight> searchFlights(AirportCode from,AirportCode to,LocalDate date) {
+    public Flux<Flight> searchFlights(AIRPORT_CODE from,AIRPORT_CODE to,LocalDate date) {
         return flightRepo.findByFromCityAndToCity(from,to)
                 .filter(flight->flight.getDepartureTime().toLocalDate().equals(date));
     }
-
 
     @Override
     public Mono<Flight> getFlightById(String flightId) 
     {
         return flightRepo.findById(flightId).switchIfEmpty(Mono.error(new NotFoundException("Flight not found")));
     }
-
 
     @Override
     public Mono<String> bookTicket(String flightId, BookingRequest request) 
@@ -107,16 +101,13 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                     {
                         return Mono.error(new BusinessException("Passengers count must be equal to seats booked"));
                     }
-                    
                     //check seat availability
                     if (flight.getAvailableSeats()<request.getSeatsBooked()) 
                     {
                         return Mono.error(new SeatUnavailableException("Not enough seats available"));
                     }
-                    
                     //check for duplicate passengers in the request
                     validatePassengerDuplicateRequest(request.getPassengers());
-                    
                     //check seat conflicts with existing bookings
                     return checkSeatConflicts(flightId,request.getPassengers()).then(saveNewBooking(flight,request));
                 }));
@@ -136,8 +127,9 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
 
         return bookingRepo.save(booking)
                 .flatMap(savedBooking ->
-                    savePassengersAndCollectIds(savedBooking.getId(), req.getPassengers())
-                        .flatMap(passengerIds -> {
+                    savePassengersAndCollectIds(savedBooking.getId(),req.getPassengers())
+                        .flatMap(passengerIds-> 
+                        {
                             savedBooking.setPassengerIds(passengerIds);
                             flight.setAvailableSeats(flight.getAvailableSeats()-req.getSeatsBooked());
                             return bookingRepo.save(savedBooking)
@@ -147,8 +139,9 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                 );
     }
     
-    private Mono<List<String>> savePassengersAndCollectIds(String bookingId, List<PassengerRequest> list) {
-        return Flux.fromIterable(list).flatMap(req -> 
+    private Mono<List<String>> savePassengersAndCollectIds(String bookingId, List<PassengerRequest> list) 
+    {
+        return Flux.fromIterable(list).flatMap(req-> 
                 {
                     Passenger passenger = new Passenger();
                     passenger.setName(req.getName());
@@ -161,7 +154,6 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                 .map(Passenger::getId)
                 .collectList();
     }
-
 
     @Override
     public Mono<Booking> getTicket(String pnr) 
@@ -216,7 +208,6 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                 });
     }
     
-    
     private void validatePassengerDuplicateRequest(List<PassengerRequest> passengers) 
     {
         Set<String> seats = new HashSet<>();
@@ -229,15 +220,11 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
         }
     }
 
-
-    
-    
     private String generateRandomPNR() 
     {
         return "PNR"+UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
     
-
     @Override
     public Flux<Booking> getBookingHistoryByEmail(String email) 
     {
@@ -245,7 +232,6 @@ public class FlightServiceReactiveImpl implements FlightServiceReactive
                 .switchIfEmpty(Mono.error(new NotFoundException("User not found with email: "+email)))
                 .flatMapMany(user->bookingRepo.findByUserId(user.getId()));
     }
-
     
     @Override
     public Flux<Flight> getFlightsByAirline(String airlineCode) 

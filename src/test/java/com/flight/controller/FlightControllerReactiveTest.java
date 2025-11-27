@@ -36,7 +36,6 @@ class FlightControllerReactiveTest
     @MockitoBean
     private FlightServiceReactive service;
 
-    
     private Flight testFlight;
     private Booking testBooking;
 
@@ -47,14 +46,14 @@ class FlightControllerReactiveTest
         testFlight.setId("F1");
         testFlight.setAirlineCode("AI");
         testFlight.setFlightNumber("AI100");
-        testFlight.setFromCity(AirportCode.DEL);
-        testFlight.setToCity(AirportCode.BOM);
+        testFlight.setFromCity(AIRPORT_CODE.DEL);
+        testFlight.setToCity(AIRPORT_CODE.BOM);
         testFlight.setDepartureTime(LocalDateTime.now().plusDays(1));
         testFlight.setArrivalTime(LocalDateTime.now().plusDays(1).plusHours(2));
         testFlight.setTotalSeats(100);
         testFlight.setAvailableSeats(100);
         testFlight.setPrice(5000);
-        testFlight.setStatus(FlightStatus.SCHEDULED);
+        testFlight.setStatus(FLIGHT_STATUS.SCHEDULED);
         
         testBooking=new Booking();
         testBooking.setId("B1");
@@ -83,10 +82,10 @@ class FlightControllerReactiveTest
     void searchFlightsSuccess() 
     {
         FlightSearchRequest req=new FlightSearchRequest();
-        req.setFrom(AirportCode.DEL);
-        req.setTo(AirportCode.BOM);
+        req.setFrom(AIRPORT_CODE.DEL);
+        req.setTo(AIRPORT_CODE.BOM);
         req.setDate(LocalDate.now().plusDays(1));
-        when(service.searchFlights(AirportCode.DEL,AirportCode.BOM,req.getDate())).thenReturn(Flux.just(testFlight));
+        when(service.searchFlights(AIRPORT_CODE.DEL,AIRPORT_CODE.BOM,req.getDate())).thenReturn(Flux.just(testFlight));
         webTestClient.post().uri("/flights/search").contentType(MediaType.APPLICATION_JSON).bodyValue(req)
                 .exchange().expectStatus().isOk().expectBodyList(String.class).hasSize(1).contains("F1");
     }
@@ -95,7 +94,6 @@ class FlightControllerReactiveTest
     void getFlightByIdSuccess() 
     {
         when(service.getFlightById("F1")).thenReturn(Mono.just(testFlight));
-
         webTestClient.get().uri("/flights/get/F1").exchange().expectStatus().isOk().expectBody()
             .jsonPath("$.flightNumber").isEqualTo("AI100");
     }
@@ -107,19 +105,17 @@ class FlightControllerReactiveTest
         req.setFlightId("F1");
         req.setUserId("user1");
         req.setSeatsBooked(1);
-        req.setMealType(MealType.VEG);
-        req.setFlightType(FlightType.ONE_WAY);
+        req.setMealType(MEAL_TYPE.VEG);
+        req.setFlightType(FLIGHT_TYPE.ONE_WAY);
 
         PassengerRequest p=new PassengerRequest();
         p.setName("A");
-        p.setGender(Gender.M);
+        p.setGender(GENDER.M);
         p.setAge(22);
         p.setSeatNumber("A1");
 
         req.setPassengers(List.of(p));
-
         when(service.bookTicket(eq("F1"),any(BookingRequest.class))).thenReturn(Mono.just("pnr123"));
-
         webTestClient.post()
                 .uri("/bookings/create")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -171,8 +167,5 @@ class FlightControllerReactiveTest
                 .expectStatus().isOk().expectBody()
                 .jsonPath("$[0].id").isEqualTo("F1");
     }
-    
-    
-    
     
 }

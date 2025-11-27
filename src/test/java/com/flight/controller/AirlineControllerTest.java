@@ -43,7 +43,6 @@ class AirlineControllerTest
         req.setCode("AI");
         req.setName("Air india");
         when(airlineRepo.save(any(Airline.class))).thenReturn(Mono.just(sample));
-
         webTestClient.post()
                 .uri("/airlines").contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(req).exchange().expectStatus().isCreated().expectBody(String.class).isEqualTo("AI");
@@ -65,7 +64,6 @@ class AirlineControllerTest
         AirlineUpdateRequest req =new AirlineUpdateRequest();
         req.setName("Ai update");
         Airline updated= new Airline("AI","Ai update");
-
         when(airlineRepo.findById("AI")).thenReturn(Mono.just(sample));
         when(airlineRepo.save(any(Airline.class))).thenReturn(Mono.just(updated));
         webTestClient.put()
@@ -75,7 +73,6 @@ class AirlineControllerTest
                 .jsonPath("$.name").isEqualTo("Ai update");
     }
 
-    
     @Test
     void deleteAirlineSuccess() 
     {

@@ -29,7 +29,6 @@ public class FlightControllerReactive
     {
         this.service=service;
     }
-
     
     //add a new flight
     @PostMapping("/flights/add")
@@ -37,7 +36,6 @@ public class FlightControllerReactive
     public Mono<String> addFlight(@RequestBody @Valid Flight flight) {
         return service.addFlight(flight).map(Flight::getId);
     }
-
 
     //serach flight using to from date
     @PostMapping("/flights/search")
@@ -67,7 +65,6 @@ public class FlightControllerReactive
     {
         return service.getTicket(pnr);
     }
-
     
     //cancel booking
     @DeleteMapping("/bookings/cancel/{pnr}")

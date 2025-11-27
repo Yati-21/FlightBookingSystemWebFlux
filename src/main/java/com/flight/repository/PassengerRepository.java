@@ -16,5 +16,4 @@ public interface PassengerRepository extends ReactiveMongoRepository<Passenger,S
     Flux<Passenger> findByBookingId(String bookingId);
 
     Mono<Void> deleteByBookingId(String bookingId);
-
 }

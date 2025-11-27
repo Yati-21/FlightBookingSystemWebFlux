@@ -1,6 +1,6 @@
 package com.flight.request;
 
-import com.flight.entity.Gender;
+import com.flight.entity.GENDER;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -18,7 +18,7 @@ public class PassengerRequest
     private String name;
 
     @NotNull(message="gender is required")
-    private Gender gender;
+    private GENDER gender;
 
     @Min(value=1,message="age must be >=1")
     @Max(value=120,message="age must be <=120")

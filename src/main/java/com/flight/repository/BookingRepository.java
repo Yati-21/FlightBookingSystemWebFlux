@@ -16,5 +16,4 @@ public interface BookingRepository extends ReactiveMongoRepository<Booking,Strin
 	Flux<Booking> findByUserId(String userId);  //get all bookings of a prticular user
     
 	Flux<Booking> findByFlightId(String flightId); // get all bookings for a particular flight
-    
 }

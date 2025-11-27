@@ -46,17 +46,18 @@ class FlightServiceReactiveImplTest
     @BeforeEach
     void setup() 
     {
+    	LocalDateTime now = LocalDateTime.now();
         validFlight=new Flight();
         validFlight.setId("flight1");
         validFlight.setAirlineCode("ai");
-        validFlight.setFromCity(AirportCode.DEL);
-        validFlight.setToCity(AirportCode.BOM);
-        validFlight.setDepartureTime(LocalDateTime.now().plusDays(2));
-        validFlight.setArrivalTime(LocalDateTime.now().plusDays(2).plusHours(2));
+        validFlight.setFromCity(AIRPORT_CODE.DEL);
+        validFlight.setToCity(AIRPORT_CODE.BOM);
+		validFlight.setDepartureTime(now.plusDays(2));
+        validFlight.setArrivalTime(now.plusDays(2).plusHours(2));
         validFlight.setTotalSeats(100);
         validFlight.setAvailableSeats(100);
         validFlight.setPrice(5000);
-        validFlight.setStatus(FlightStatus.SCHEDULED);
+        validFlight.setStatus(FLIGHT_STATUS.SCHEDULED);
         validFlight.setFlightNumber("ai101");
     }
 
@@ -74,8 +75,8 @@ class FlightServiceReactiveImplTest
     {
         validFlight.setDepartureTime(LocalDateTime.of(2030,1,1, 10,0));
         LocalDate date=LocalDate.of(2030 ,1, 1);
-        when(flightRepo.findByFromCityAndToCity(AirportCode.DEL, AirportCode.BOM)).thenReturn(Flux.just(validFlight));
-        StepVerifier.create(service.searchFlights(AirportCode.DEL,AirportCode.BOM, date)).expectNext(validFlight) .verifyComplete();
+        when(flightRepo.findByFromCityAndToCity(AIRPORT_CODE.DEL, AIRPORT_CODE.BOM)).thenReturn(Flux.just(validFlight));
+        StepVerifier.create(service.searchFlights(AIRPORT_CODE.DEL,AIRPORT_CODE.BOM, date)).expectNext(validFlight) .verifyComplete();
     }
 
     //getFlightById()
@@ -86,7 +87,6 @@ class FlightServiceReactiveImplTest
         StepVerifier.create(service.getFlightById("flight1")).expectNext(validFlight).verifyComplete();
     }
 
-
     //bookTicket()
     private BookingRequest createValidBookingRequest() 
     {
@@ -94,17 +94,17 @@ class FlightServiceReactiveImplTest
         req.setFlightId("flight1");
         req.setUserId("user1");
         req.setSeatsBooked(2);
-        req.setMealType(MealType.VEG);
-        req.setFlightType(FlightType.ONE_WAY);
+        req.setMealType(MEAL_TYPE.VEG);
+        req.setFlightType(FLIGHT_TYPE.ONE_WAY);
 
         PassengerRequest passReq1=new PassengerRequest();
         passReq1.setName("A");
-        passReq1.setGender(Gender.M);
+        passReq1.setGender(GENDER.M);
         passReq1.setAge(20);
         passReq1.setSeatNumber("A1");
         PassengerRequest passReq2=new PassengerRequest();
         passReq2.setName("B");
-        passReq2.setGender(Gender.F);
+        passReq2.setGender(GENDER.F);
         passReq2.setAge(22);
         passReq2.setSeatNumber("A2");
 
@@ -160,7 +160,6 @@ class FlightServiceReactiveImplTest
         StepVerifier.create(service.cancelBooking("PNR123")).verifyComplete();
     }
 
-
     //getBookingHistoryByEmail()
     @Test
     void testGetBookingHistoryByEmailSuccess() 
@@ -174,7 +173,6 @@ class FlightServiceReactiveImplTest
         StepVerifier.create(service.getBookingHistoryByEmail("a@test.com")).expectNext(booking ).verifyComplete();
     }
 
-
     //getFlightsByAirline()
     @Test
     void testGetFlightsByAirline() 
@@ -182,7 +180,6 @@ class FlightServiceReactiveImplTest
         when(flightRepo.findByAirlineCode("ai")).thenReturn(Flux.just(validFlight));
         StepVerifier.create(service.getFlightsByAirline("ai")).expectNext(validFlight).verifyComplete();
     }
-    
     
     @Test
     void testGetTicketSuccess() 
@@ -206,7 +203,5 @@ class FlightServiceReactiveImplTest
         StepVerifier.create(service.getBookingHistoryByUserId("user1")).expectNext(booking).verifyComplete();
         verify(bookingRepo).findByUserId("user1");
     }
-
-    
     
 }

@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class AirlineCreateRequest 
 {
-
     @NotBlank(message="Airline code is required")
     private String code;
 

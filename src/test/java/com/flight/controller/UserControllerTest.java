@@ -8,6 +8,7 @@ import com.flight.exception.GlobalErrorHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,11 +18,10 @@ import reactor.core.publisher.Mono;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@org.springframework.boot.webflux.test.autoconfigure.WebFluxTest(controllers=UserController.class)
+@WebFluxTest(controllers=UserController.class)
 @Import(GlobalErrorHandler.class)
 class UserControllerTest 
 {
-
     @Autowired
     private WebTestClient webTestClient;
 
@@ -55,7 +55,6 @@ class UserControllerTest
     void getUserSuccess() 
     {
         when(userRepo.findById("user1")).thenReturn(Mono.just(sampleUser));
-
         webTestClient.get().uri("/users/user1").exchange().expectStatus().isOk().expectBody()
                 .jsonPath( "$.id").isEqualTo("user1").jsonPath("$.email").isEqualTo("abc@test.com");
     }
@@ -72,19 +71,16 @@ class UserControllerTest
 
         when(userRepo.findById("user1")).thenReturn(Mono.just(sampleUser));
         when(userRepo.save(any(User.class))).thenReturn(Mono.just(update));
-
         webTestClient.put().uri("/users/user1").contentType(MediaType.APPLICATION_JSON).bodyValue(req)
                 .exchange().expectStatus().isOk().expectBody()
                 .jsonPath("$.name").isEqualTo("abc update").jsonPath("$.email").isEqualTo("abc2@test.com");
     }
-
 
     @Test
     void deleteUserSuccess() 
     {
         when(userRepo.findById("user1")).thenReturn(Mono.just(sampleUser));
         when(userRepo.deleteById("user1")).thenReturn(Mono.empty());
-
         webTestClient.delete().uri("/users/user1").exchange().expectStatus().isOk();
     }
 

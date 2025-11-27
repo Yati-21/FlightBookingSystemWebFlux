@@ -6,7 +6,6 @@ package com.flight.exception;
 	//trying to update/cancel within 24 hours
 	//invalid airport codes
 
-
 public class BusinessException extends RuntimeException 
 {
     public BusinessException(String message) 

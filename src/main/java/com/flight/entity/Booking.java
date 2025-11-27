@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document("bookings")
-public class Booking {
-
+public class Booking 
+{
     @Id
     private String id;
 
@@ -27,7 +27,7 @@ public class Booking {
     @NotBlank(message="UserId is required")
     private String userId;
 
-    //from flihgt table
+    //from flight table
     @NotBlank(message="FlightId is required")
     private String flightId;
 
@@ -35,10 +35,10 @@ public class Booking {
     private int seatsBooked;
 
     @NotNull(message="Meal type is required")
-    private MealType mealType;
+    private MEAL_TYPE mealType;
     
     @NotNull(message = "flightType is required")
-    private FlightType flightType;
+    private FLIGHT_TYPE flightType;
     
     private List<String> passengerIds;
         

@@ -34,7 +34,6 @@ public class GlobalErrorHandler
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
 
-    
     @ExceptionHandler(NotFoundException.class)
     public Mono<ResponseEntity<Map<String, String>>> handleNotFound(NotFoundException ex) 
     {
@@ -42,7 +41,6 @@ public class GlobalErrorHandler
         return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(error));
     }
 
-    
     @ExceptionHandler(SeatUnavailableException.class)
     public Mono<ResponseEntity<Map<String, String>>> handleSeatUnavailable(SeatUnavailableException ex) 
     {
@@ -50,7 +48,6 @@ public class GlobalErrorHandler
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error));
     }
 
-    
     @ExceptionHandler(BusinessException.class)
     public Mono<ResponseEntity<Map<String, String>>> handleBusiness(BusinessException ex) 
     {
@@ -58,7 +55,6 @@ public class GlobalErrorHandler
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error));
     }
 
-    
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<Map<String,String>>> handleGeneral(Exception ex) 
     {

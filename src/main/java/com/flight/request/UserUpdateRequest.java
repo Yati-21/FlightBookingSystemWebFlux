@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class UserUpdateRequest 
 {
-
     @NotBlank(message="User name is required")
     private String name;
 

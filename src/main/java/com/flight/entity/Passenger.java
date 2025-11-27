@@ -24,7 +24,7 @@ public class Passenger
     private String name;
 
     @NotNull(message="Gender is required")
-    private Gender gender;
+    private GENDER gender;
 
     @Min(value=1)
     @Max(value=120)
@@ -33,7 +33,6 @@ public class Passenger
     @NotBlank(message="Seat number is required")
     private String seatNumber;
 
-    
     //Booking table ref
     @NotBlank(message="BookingId is required")
     private String bookingId;

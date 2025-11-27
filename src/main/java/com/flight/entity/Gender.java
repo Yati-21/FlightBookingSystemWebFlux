@@ -1,6 +1,6 @@
 package com.flight.entity;
 
-public enum Gender {
+public enum GENDER {
     M, 
     F, 
     O //other
