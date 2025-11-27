@@ -81,5 +81,4 @@ class AirlineControllerTest
         webTestClient.delete().uri("/airlines/AI").exchange().expectStatus().isOk();
     }
 
-
 }
